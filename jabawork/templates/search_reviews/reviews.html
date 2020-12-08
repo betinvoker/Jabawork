@@ -16,17 +16,37 @@
     </div>
 </div>
 
+<div class="row justify-content-end">
+  <p>
+    <a class="btn btn-outline-success" data-bs-toggle="collapse" href="#multiCollapseExample1" role="button" aria-expanded="false" aria-controls="multiCollapseExample1">Добавить свой отзыв</a>
+  </p>
+</div>
+<div class="row">
+  <div class="col">
+    <div class="collapse multi-collapse" id="multiCollapseExample1">
+      <div class="card card-body">
+        <p style="color: red;">*Отзыв не может быть короче тысячи(1000) символов.<br>
+        *Пожалуйста, избегайте нецензурной брани.<br>
+        *Просим Вас не раскрывать чужие личности.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="row justify-content-center">
-    {% for r in opinions %}
-        <div class="card">
-            <div class="card-body">
-              <h5 class="card-title text-center">{{ r.opinion }}</h5>
-              <p class="card-text">{{ r.text }}</p>
-              <p class="card-text text-center"><small class="text-muted">{{ r.date }}</small></p>
-            </div>
-          </div>
-    {% endfor %}
+  {% for r in opinions %}
+    {% if  r.opinion == "True" %}
+      <div class="card text-black bg-success">
+    {% else %}
+      <div class="card text-black bg-danger">
+    {% endif %}
+        <div class="card-header text-center"><h4>{{ r.opinion }}</h4></div>
+        <div class="card-body">
+          <p class="card-text">{{ r.text }}</p>
+        </div>
+        <div class="card-footer bg-transparent text-center">{{ r.date_opinion }}</div>
+      </div>
+  {% endfor %}
 </div>
 
 {% endblock content %}

@@ -20,17 +20,19 @@ def main():
     #click_btn_universities()
     #   Парсить данные об университетах со страницы
     #parse_list_of_universities()
-    #   Закрыть браузер после выполнения
-    #driver.close()
-
+    #   Взять из базы список университетов
     sqlite_select_query = "SELECT * from search_reviews_universities"
     cursor.execute(sqlite_select_query)
     all_universities = cursor.fetchall()
-
+    #   Перебрать все университеты по списку
     for university in all_universities:
     #   Страница с отзывами об университете
         click_btn_reviews(university[3])
         parse_list_of_reviews(university[0])
+        time.sleep(5)
+    
+    #   Закрыть браузер после выполнения
+    driver.close()
 
 
 #   Нажимать на кнопку загрузить еще, пока она существует на странице
@@ -46,7 +48,6 @@ def click_btn_universities():
 #   Открыть страницу с отзывами и нажимать кнопку, пока она существует на странице
 def click_btn_reviews(link):
     driver.get(link)
-
     btn = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[7]')
 
     while driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[7]') == True:
@@ -73,12 +74,13 @@ def parse_list_of_universities():
 
         print(abbreviation.text + " | " + full_name.text + " | " + link.get_attribute("href") + " | " + logo.get_attribute("src")[31:] + " | " + link_universitiy + "\n")
         #   Добавить университет в базу
-        #adding_universities(abbreviation.text, full_name.text, link.get_attribute("href"), logo.get_attribute("src")[31:], link_universitiy)
+        adding_universities(abbreviation.text, full_name.text, link.get_attribute("href"), logo.get_attribute("src")[31:], link_universitiy)
         
         i += 1
     #   Сохранить изменения в базе
     conn.commit()
 
+#   Парсить данные с отзывами об университете
 def parse_list_of_reviews(university):  
     block = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]')
     all_reviews = block.find_elements_by_class_name('mobpadd20-2')
@@ -88,7 +90,7 @@ def parse_list_of_reviews(university):
     #   Цикл сбора данных и записи данных об университете
     for review in all_reviews:
         text = review.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]')
-        date = review.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[1]/div/div[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/span[2]')
+        date_opinion = review.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[1]/div/div[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/span[2]')
         
         picture = review.find_element_by_tag_name("img")
         if picture.get_attribute("src") == "https://tabiturient.ru/img/smile2.png":
@@ -98,8 +100,8 @@ def parse_list_of_reviews(university):
         
         id_university = str(university)
 
-        print(text.text + " | " + date.text + " | " + opinion + " | " + id_university + "\n")
-        adding_reviews(text.text, date.text, opinion, id_university)
+        print(text.text + " | " + date_opinion.text + " | " + opinion + " | " + id_university + "\n")
+        adding_reviews(text.text, date_opinion.text, opinion, id_university)
         
         i += 1
 
@@ -107,14 +109,14 @@ def parse_list_of_reviews(university):
     conn.commit()
 
 #   Добавить университет в базу
-def adding_universities(abbreviated, date, link, logo, link_universitiy):
-    cursor.execute("INSERT INTO search_reviews_universities(abbreviated, name, link, logo, link_universitiy) VALUES ('" 
-                        + abbreviated + "','" + name + "','" + link + "','" + logo + "','" + link_universitiy + "')")
+def adding_universities(abbreviated, full_name, link, logo, link_universitiy):
+    cursor.execute("INSERT INTO search_reviews_universities(abbreviated, name, link, logo, link_universitiy) VALUES (?,?,?,?,?)", 
+                        (abbreviated, full_name, link, logo, link_universitiy))
        
 #   Добавить отзывов об университете в базу
-def adding_reviews(text, date, opinion, id_university):
-    cursor.execute("INSERT INTO search_reviews_opinions(text, date, opinion, university_id) VALUES ('" 
-                        + text + "','" + date + "','" + opinion + "','" + id_university + "')")
+def adding_reviews(text, date_opinion, opinion, id_university):
+    cursor.execute("INSERT INTO search_reviews_opinions(text, date_opinion, opinion, university_id) VALUES (?,?,?,?)", 
+                        (text, date_opinion, opinion, id_university))
 
 if __name__ == "__main__":
     main()
