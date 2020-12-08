@@ -1,0 +1,32 @@
+<!-- Подключение шаблона страницы -->
+{% extends "base.html" %}
+<!-- Название вкладки страницы -->
+{% block title %}{{ review.abbreviated }}{% endblock title %}
+<!-- Заголовок страницы -->
+{% block header %}Главная{% endblock header %}
+<!-- Контент страницы с основной информацией -->
+{% block content %}
+<div class="row justify-content-center">
+    <div class="media">
+        <img src="../static/img/logo/{{ review.logo }}" alt="{{ review.name }}" class="align-self-center mr-5 pie" width="150" height="150">
+        <div class="media-body">
+          <h5 class="mt-0">{{ review.abbreviated }}</h5>
+          <p>{{ review.name }}</p>
+        </div>
+    </div>
+</div>
+
+
+<div class="row justify-content-center">
+    {% for r in opinions %}
+        <div class="card">
+            <div class="card-body">
+              <h5 class="card-title text-center">{{ r.opinion }}</h5>
+              <p class="card-text">{{ r.text }}</p>
+              <p class="card-text text-center"><small class="text-muted">{{ r.date }}</small></p>
+            </div>
+          </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}
