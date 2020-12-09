@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.views.generic import View, DetailView, ListView
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Universities, Opinions
+from .forms import OpinionForm
 
 #   Список университетов
 class MainPostList(View):
@@ -30,6 +31,21 @@ class ReviewsDetailView(DetailView):
     # Переопределение параметров ReviewsDetailView
     def get_context_data(self, *args, **kwargs): 
         context = super(ReviewsDetailView, 
-             self).get_context_data(*args, **kwargs) 
+             self).get_context_data(*args, **kwargs)
+        context["opinionform"] = OpinionForm()
         context["opinions"] = Opinions.objects.all().filter(university_id = ReviewsDetailView.get_object(self))       
         return context 
+    
+    def post(self, request, *args, **kwargs):
+        form = ReviewsDetailView(request.POST, request.FILES)
+        if form.is_valid():
+            self.object = self.get_object()
+            context = super(ReviewsDetailView, self).get_context_data(**kwargs)
+            context['opinionform'] = OpinionForm
+            return self.render_to_response(context=context)
+
+        else:
+            self.object = self.get_object()
+            context = super(Detail, self).get_context_data(**kwargs)
+            context['form'] = form
+            return self.render_to_response( context=context)

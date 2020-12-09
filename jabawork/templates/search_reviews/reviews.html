@@ -25,28 +25,50 @@
   <div class="col">
     <div class="collapse multi-collapse" id="multiCollapseExample1">
       <div class="card card-body">
-        <p style="color: red;">*Отзыв не может быть короче тысячи(1000) символов.<br>
-        *Пожалуйста, избегайте нецензурной брани.<br>
-        *Просим Вас не раскрывать чужие личности.</p>
+        <form method="POST" novalidate>
+          {% csrf_token %}
+          <div class="form-group">
+            <label>
+              <p style="color: red;">*Отзыв не может быть короче тысячи(1000) символов.<br>
+                *Пожалуйста, избегайте нецензурной брани.<br>
+                *Просим Вас не раскрывать чужие личности.</p>
+            </label>
+            {{ opinionform.opinion }}
+            {{ opinionform.text }}
+          </div>
+           
+          <input type="submit" class="btn btn-outline-success text-center" value="Отправить">
+        </form>
+      </table>
       </div>
     </div>
   </div>
 </div>
 
 <div class="row justify-content-center">
-  {% for r in opinions %}
-    {% if  r.opinion == "True" %}
-      <div class="card text-black bg-success">
-    {% else %}
-      <div class="card text-black bg-danger">
-    {% endif %}
-        <div class="card-header text-center"><h4>{{ r.opinion }}</h4></div>
-        <div class="card-body">
-          <p class="card-text">{{ r.text }}</p>
+  {% if opinions.count > 0 %}
+    {% for r in opinions %}
+      {% if  r.opinion == "True" %}
+        <div class="card col-12 text-black bg-success">
+          <div class="card-header text-center"><h4>Положительный отзыв</h4></div>
+      {% else %}
+        <div class="card col-12 text-black bg-danger">
+          <div class="card-header text-center"><h4>Отрицательный отзыв</h4></div>
+      {% endif %}
+          <div class="card-body">
+            <p class="card-text">{{ r.text }}</p>
+          </div>
+          <div class="card-footer bg-transparent text-center">{{ r.date_opinion }}</div>
         </div>
-        <div class="card-footer bg-transparent text-center">{{ r.date_opinion }}</div>
+    {% endfor %}
+  {% else %}
+    <div class="card col-12 text-black">
+      <div class="card-body">
+        <p class="card-text">This card has a regular title and short paragraphy of text below it.his card ha
+        </p>
       </div>
-  {% endfor %}
+    </div>
+  {% endif %}
 </div>
 
 {% endblock content %}
