@@ -15,5 +15,5 @@ class UniversitiesAdmin(admin.ModelAdmin):
 @admin.register(Opinions)
 class OpinionsAdmin(admin.ModelAdmin):
     list_display = ("id", "text", "date_opinion", "opinion", "university")
-    list_filter = ("date_opinion", "opinion")
+    list_filter = ("opinion",)
     search_fields = ("text",)

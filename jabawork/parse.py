@@ -14,26 +14,84 @@ conn = sqlite3.connect('db.sqlite3')
 cursor = conn.cursor()
 
 def main():
-    #   Главная страница сайта
-    #driver.get("https://tabiturient.ru/")
-    #   Нажимать на кнопку загрузить еще, пока она существует на странице
-    #click_btn_universities()
-    #   Парсить данные об университетах со страницы
-    #parse_list_of_universities()
+    #   Проверить таблицу Universities на заполненность.
+    #   Если в ней уже есть записи, то сравнить последнюю запись с первой записью на странице.
+    #   Иначе, просто заполнить таблицу. 
+    changing_the_table_universities()
+    #   Заполнение таблици Opinions. 
+    filling_in_the_table_opinions()
+    #   Закрыть браузер после выполнения
+    driver.close()
+
+#   Проверить таблицу Universities на заполненность.
+#   Если в ней уже есть записи, то сравнить последнюю запись с первой записью на странице.
+#   Иначе, просто заполнить таблицу. 
+def changing_the_table_universities():
+    #   Берем количество записей из таблицы Universities и присваиваем его переменной
+    sqlite_select_count_universities = "SELECT COUNT(*) FROM search_reviews_universities"
+    cursor.execute(sqlite_select_count_universities)
+    count_universities = int(cursor.fetchone()[0])
+    #   Если количество записей в таблице больше нуля, то выполняем условие.
+    #   Если оно равно нулю, тогда заполняем таблицу данными со страницы сайта.
+    if count_universities > 0:
+        #   Пока не придумал, что должно тут выводиться
+        print("Таблица Universities содержит - " + str(count_universities) + " записей.\n")
+    else:
+        #   Главная страница сайта
+        driver.get("https://tabiturient.ru/")
+        #   Нажимать на кнопку загрузить еще, пока она существует на странице
+        click_btn_universities()
+        #   Парсить данные об университетах со страницы
+        #parse_list_of_universities()
+
+#   Заполнение таблици Opinions.
+def filling_in_the_table_opinions():
     #   Взять из базы список университетов
     sqlite_select_query = "SELECT * from search_reviews_universities"
     cursor.execute(sqlite_select_query)
     all_universities = cursor.fetchall()
-    #   Перебрать все университеты по списку
-    for university in all_universities:
-    #   Страница с отзывами об университете
-        click_btn_reviews(university[3])
-        parse_list_of_reviews(university[0])
-        time.sleep(5)
-    
-    #   Закрыть браузер после выполнения
-    driver.close()
+    #   Берем количество записей из таблицы Opinions и присваиваем его переменной
+    sqlite_select_count_opinions = "SELECT COUNT(*) FROM search_reviews_opinions"
+    cursor.execute(sqlite_select_count_opinions)
+    count_opinions = int(cursor.fetchone()[0])
+    #   Если количество записей в таблице больше нуля, то выполняем условие.
+    #   Если оно равно нулю, тогда заполняем таблицу данными со страницы сайта.
+    if count_opinions > 0:
+        #   Перебрать все университеты по списку
+        for university in all_universities:
+            #   Берем первую запись из стаблицы Opinions, 
+            #   которая связана с записью в таблице Universities
+            sqlite_select_last_opinion = "SELECT id, text FROM search_reviews_opinions WHERE university_id = " + str(university[0]) + " ORDER BY id LIMIT 1"
+            cursor.execute(sqlite_select_last_opinion)
+            #   Нажимаем кнопку "Загрузить еще...", пока она отображается
+            click_btn_opinions(university[3])
 
+            block = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]')
+            last_opinions = block.find_element_by_class_name('mobpadd20-2')
+            text = last_opinions.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[2]')
+            base_text = str(cursor.fetchone()[1])
+            if base_text == text.text:
+                print(base_text + "\n")
+                print("---------------------------")
+                print(text.text)
+                print("yes\n")
+            else:
+                print(base_text + "\n")
+                print("---------------------------")
+                print(text.text)
+                print("no\n")
+        #for item in cursor.fetchall():
+            #print(str(item) + "\n")
+            #print(cursor.fetchone())
+            time.sleep(5)
+    else:
+        #   Перебрать все университеты по списку
+        for university in all_universities:
+            #   Нажимаем кнопку "Загрузить еще...", пока она отображается
+            click_btn_opinions(university[3])
+            #   Выбираем нужные данные и записываем их в таблицу Opinions
+            parse_list_of_opinions(university[0])
+            time.sleep(5)
 
 #   Нажимать на кнопку загрузить еще, пока она существует на странице
 def click_btn_universities():
@@ -46,7 +104,7 @@ def click_btn_universities():
             break
 
 #   Открыть страницу с отзывами и нажимать кнопку, пока она существует на странице
-def click_btn_reviews(link):
+def click_btn_opinions(link):
     driver.get(link)
     btn = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[7]')
 
@@ -81,18 +139,18 @@ def parse_list_of_universities():
     conn.commit()
 
 #   Парсить данные с отзывами об университете
-def parse_list_of_reviews(university):  
+def parse_list_of_opinions(university):
     block = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]')
-    all_reviews = block.find_elements_by_class_name('mobpadd20-2')
+    all_opinions = block.find_elements_by_class_name('mobpadd20-2')
 
     i = 1
 
     #   Цикл сбора данных и записи данных об университете
-    for review in all_reviews:
-        text = review.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]')
-        date_opinion = review.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[1]/div/div[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/span[2]')
+    for opinion in all_opinions:
+        text = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]')
+        date_opinion = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[1]/div/div[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/span[2]')
         
-        picture = review.find_element_by_tag_name("img")
+        picture = opinion.find_element_by_tag_name("img")
         if picture.get_attribute("src") == "https://tabiturient.ru/img/smile2.png":
             opinion = "False"
         else:
@@ -101,7 +159,7 @@ def parse_list_of_reviews(university):
         id_university = str(university)
 
         print(text.text + " | " + date_opinion.text + " | " + opinion + " | " + id_university + "\n")
-        adding_reviews(text.text, date_opinion.text, opinion, id_university)
+        adding_opinions(text.text, date_opinion.text, opinion, id_university)
         
         i += 1
 
@@ -114,7 +172,7 @@ def adding_universities(abbreviated, full_name, link, logo, link_universitiy):
                         (abbreviated, full_name, link, logo, link_universitiy))
        
 #   Добавить отзывов об университете в базу
-def adding_reviews(text, date_opinion, opinion, id_university):
+def adding_opinions(text, date_opinion, opinion, id_university):
     cursor.execute("INSERT INTO search_reviews_opinions(text, date_opinion, opinion, university_id) VALUES (?,?,?,?)", 
                         (text, date_opinion, opinion, id_university))
 

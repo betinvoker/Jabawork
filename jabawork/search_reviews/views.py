@@ -10,7 +10,7 @@ class MainPostList(View):
     def get(self, request):
         universities = Universities.objects.all()
         #   Пагинатор выбирает из таблицы Universities 10 университетов и выводит их на страницу
-        paginator = Paginator(universities, 10)
+        paginator = Paginator(universities, 4)
 
         page_number = request.GET.get('page')
         try:
