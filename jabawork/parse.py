@@ -19,7 +19,7 @@ def main():
     #   Иначе, просто заполнить таблицу. 
     changing_the_table_universities()
     #   Заполнение таблици Opinions. 
-    filling_in_the_table_opinions()
+    #filling_in_the_table_opinions()
     #   Закрыть браузер после выполнения
     driver.close()
 
@@ -42,7 +42,7 @@ def changing_the_table_universities():
         #   Нажимать на кнопку загрузить еще, пока она существует на странице
         click_btn_universities()
         #   Парсить данные об университетах со страницы
-        #parse_list_of_universities()
+        parse_list_of_universities()
 
 #   Заполнение таблици Opinions.
 def filling_in_the_table_opinions():
@@ -59,31 +59,27 @@ def filling_in_the_table_opinions():
     if count_opinions > 0:
         #   Перебрать все университеты по списку
         for university in all_universities:
-            #   Берем первую запись из стаблицы Opinions, 
-            #   которая связана с записью в таблице Universities
-            sqlite_select_last_opinion = "SELECT id, text FROM search_reviews_opinions WHERE university_id = " + str(university[0]) + " ORDER BY id LIMIT 1"
-            cursor.execute(sqlite_select_last_opinion)
-            #   Нажимаем кнопку "Загрузить еще...", пока она отображается
-            click_btn_opinions(university[3])
+            try:
+                #   Берем первую запись из стаблицы Opinions, 
+                #   которая связана с записью в таблице Universities
+                sqlite_select_last_opinion = "SELECT id, text FROM search_reviews_opinions WHERE university_id = " + str(university[0]) + " ORDER BY id LIMIT 1"
+                cursor.execute(sqlite_select_last_opinion)
+                #   Нажимаем кнопку "Загрузить еще...", пока она отображается
+                click_btn_opinions(university[3])
 
-            block = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]')
-            last_opinions = block.find_element_by_class_name('mobpadd20-2')
-            text = last_opinions.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[2]')
-            base_text = str(cursor.fetchone()[1])
-            if base_text == text.text:
-                print(base_text + "\n")
-                print("---------------------------")
-                print(text.text)
-                print("yes\n")
-            else:
-                print(base_text + "\n")
-                print("---------------------------")
-                print(text.text)
-                print("no\n")
-        #for item in cursor.fetchall():
-            #print(str(item) + "\n")
-            #print(cursor.fetchone())
-            time.sleep(5)
+                block = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]')
+                last_opinions = block.find_element_by_class_name('mobpadd20-2')
+                text = last_opinions.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[2]')
+                base_text = str(cursor.fetchone()[1])
+                if base_text == text.text:
+                    print(str(university[0]) + " yes\n")
+                    print("---------------------------\n")
+                else:
+                    print(str(university[0]) + " no\n")
+                    print("---------------------------\n")
+                time.sleep(5)
+            except Error(Exception):
+                pass
     else:
         #   Перебрать все университеты по списку
         for university in all_universities:
@@ -118,8 +114,7 @@ def click_btn_opinions(link):
 #   Парсить данные об университетах со страницы
 def parse_list_of_universities():  
     block = driver.find_element_by_id('resultdiv0')
-    all_universities = block.find_elements_by_class_name('mobpadd20')
-
+    all_universities = reversed(block.find_elements_by_class_name('mobpadd20'))
     i = 1
 
     #   Цикл сбора данных и записи данных об университете
@@ -141,7 +136,7 @@ def parse_list_of_universities():
 #   Парсить данные с отзывами об университете
 def parse_list_of_opinions(university):
     block = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]')
-    all_opinions = block.find_elements_by_class_name('mobpadd20-2')
+    all_opinions = reversed(block.find_elements_by_class_name('mobpadd20-2'))
 
     i = 1
 

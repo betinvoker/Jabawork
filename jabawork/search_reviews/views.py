@@ -8,9 +8,9 @@ from .forms import OpinionForm
 #   Список университетов
 class MainPostList(View):
     def get(self, request):
-        universities = Universities.objects.all()
-        #   Пагинатор выбирает из таблицы Universities 10 университетов и выводит их на страницу
-        paginator = Paginator(universities, 4)
+        universities = Universities.objects.order_by("-id")
+        #   Пагинатор выбирает из таблицы Universities 8 университетов и выводит их на страницу
+        paginator = Paginator(universities, 8)
 
         page_number = request.GET.get('page')
         try:
