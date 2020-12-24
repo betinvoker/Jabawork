@@ -19,7 +19,7 @@ def main():
     #   Иначе, просто заполнить таблицу. 
     changing_the_table_universities()
     #   Заполнение таблици Opinions. 
-    #filling_in_the_table_opinions()
+    filling_in_the_table_opinions()
     #   Закрыть браузер после выполнения
     driver.close()
 
@@ -27,20 +27,23 @@ def main():
 #   Если в ней уже есть записи, то сравнить последнюю запись с первой записью на странице.
 #   Иначе, просто заполнить таблицу. 
 def changing_the_table_universities():
+    #   Главная страница сайта
+    driver.get("https://tabiturient.ru/")
+    #   Нажимать на кнопку загрузить еще, пока она существует на странице
+    click_btn_universities()
+    block = driver.find_element_by_id('resultdiv0')
+    all_universities = len(block.find_elements_by_class_name('mobpadd20'))
     #   Берем количество записей из таблицы Universities и присваиваем его переменной
     sqlite_select_count_universities = "SELECT COUNT(*) FROM search_reviews_universities"
     cursor.execute(sqlite_select_count_universities)
     count_universities = int(cursor.fetchone()[0])
     #   Если количество записей в таблице больше нуля, то выполняем условие.
     #   Если оно равно нулю, тогда заполняем таблицу данными со страницы сайта.
-    if count_universities > 0:
+    if count_universities == all_universities:
         #   Пока не придумал, что должно тут выводиться
-        print("Таблица Universities содержит - " + str(count_universities) + " записей.\n")
+        print("Таблица Universities содержит - " + str(count_universities) + " записей из "+ str(all_universities) +"\n")
     else:
-        #   Главная страница сайта
-        driver.get("https://tabiturient.ru/")
-        #   Нажимать на кнопку загрузить еще, пока она существует на странице
-        click_btn_universities()
+        print("Таблица Universities содержит - " + str(count_universities) + " записей из "+ str(all_universities) +"\n")
         #   Парсить данные об университетах со страницы
         parse_list_of_universities()
 
