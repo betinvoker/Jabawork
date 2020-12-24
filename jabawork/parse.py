@@ -117,7 +117,7 @@ def click_btn_opinions(link):
 #   Парсить данные об университетах со страницы
 def parse_list_of_universities():  
     block = driver.find_element_by_id('resultdiv0')
-    all_universities = reversed(block.find_elements_by_class_name('mobpadd20'))
+    all_universities = block.find_elements_by_class_name('mobpadd20')
     i = 1
 
     #   Цикл сбора данных и записи данных об университете
@@ -147,8 +147,8 @@ def parse_list_of_opinions(university):
     for opinion in all_opinions:
         text = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]')
         date_opinion = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[1]/div/div[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/span[2]')
-        
         picture = opinion.find_element_by_tag_name("img")
+
         if picture.get_attribute("src") == "https://tabiturient.ru/img/smile2.png":
             opinion = "False"
         else:

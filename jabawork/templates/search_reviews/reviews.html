@@ -6,14 +6,21 @@
 {% block header %}Главная{% endblock header %}
 <!-- Контент страницы с основной информацией -->
 {% block content %}
-<div class="row justify-content-center">
+<div class="row justify-content-center" style="margin-bottom: 60px;">
     <div class="media">
-        <img src="../static/img/logo/{{ review.logo }}" alt="{{ review.name }}" class="align-self-center mr-5 pie" width="150" height="150">
+        <img src="../static/img/logo/{{ review.logo }}" alt="{{ review.name }}" class="align-self-center mr-5 pie" width="200" height="200">
         <div class="media-body">
-          <h5 class="mt-0">{{ review.abbreviated }}</h5>
-          <p>{{ review.name }}</p>
+          <h2 class="mt-0">{{ review.abbreviated }}</h2>
+          <h3>{{ review.name }}</h3>
+          <br>
+          <h4>
+            <span class="badge badge-pill badge-secondary" style="font-weight: 100">Кол-во отзывов : 3</span>  
+            <span class="badge badge-pill badge-success" style="font-weight: 100">Положительные : 2</span>
+            <span class="badge badge-pill badge-danger" style="font-weight: 100">Отрицательные : 1</span>
+          </h4>
         </div>
     </div>
+    <img src="../static/img/diagr.PNG">
 </div>
 
 <div class="row justify-content-end">

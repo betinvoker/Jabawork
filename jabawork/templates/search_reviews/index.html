@@ -7,10 +7,67 @@
 <!-- Контент страницы с основной информацией -->
 {% block content %}
 <div class="row justify-content-center">
-    <p class="display-4">
+    <p class="display-3">
         Университеты России
     </p>
 </div>
+
+<div class="row justify-content-center" style="margin-bottom: 30px;">
+  <h2 class="text-center" style="margin-bottom: 30px;">Самые популярные университеты</h2>
+  <div class="card-deck">
+    <div class="card" style="background: #dedbde;">
+      <img src="../static/img/logo/spbgmu.png" alt="..." class="rounded-circle mx-auto d-block" width="130" height="130" style="margin-top: 20px;">
+      <div class="card-body">
+        <h5 class="card-title text-center">ПСПбГМУ им. И. П. Павлова</h5>
+      </div>
+      <div class="card-footer border-0">
+        <h3 class="card-text text-center" style="font-family: FreeMono, monospace">4</h3>
+        <p class="text-center">9 / 10</p>
+      </div>
+    </div>
+    <div class="card" style="background: #dedbde;">
+      <img src="../static/img/logo/spbgu.png" alt="..." class="rounded-circle mx-auto d-block" width="130" height="130" style="margin-top: 20px;">
+      <div class="card-body">
+        <h5 class="card-title text-center">СПбГУ</h5>
+      </div>
+      <div class="card-footer border-0">
+        <h3 class="card-text text-center" style="font-family: FreeMono, monospace">2</h3>
+        <p class="text-center">9.3 /10</p>
+      </div>
+    </div>
+    <div class="card" style="background: wheat;">
+      <img src="../static/img/logo/ranepa.png" alt="..." class="rounded-circle mx-auto d-block" width="130" height="130" style="margin-top: 20px;">
+      <div class="card-body">
+        <h5 class="card-title text-center">РАНХиГС</h5>
+      </div>
+      <div class="card-footer border-0">
+        <h3 class="card-text text-center" style="font-family: FreeMono, monospace">1</h3>
+        <p class="text-center">9.3 / 10</p>
+      </div>
+    </div>
+    <div class="card" style="background: #dedbde;">
+      <img src="../static/img/logo/mgtu.png" alt="..." class="rounded-circle mx-auto d-block" width="130" height="130" style="margin-top: 20px;">
+      <div class="card-body">
+        <h5 class="card-title text-center">МГТУ им. Баумана</h5>
+      </div>
+      <div class="card-footer border-0">
+        <h3 class="card-text text-center" style="font-family: FreeMono, monospace">3</h3>
+        <p class="text-center">9.2 / 10</p>
+      </div>
+    </div>
+    <div class="card" style="background: #dedbde;">
+      <img src="../static/img/logo/gubkina.png" alt="..." class="rounded-circle mx-auto d-block" width="130" height="130" style="margin-top: 20px;">
+      <div class="card-body">
+        <h5 class="card-title text-center">РГУНГ им. Губкина</h5>
+      </div>
+      <div class="card-footer border-0">
+        <h3 class="card-text text-center" style="font-family: FreeMono, monospace">5</h3>
+        <p class="text-center">9 / 10</p>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <div class="row justify-content-center">
   <ul class="list-unstyled">
@@ -24,6 +81,7 @@
                 <h5 class="mt-0">{{ university.abbreviated }}</h5>
                 <p class="mb-0">{{ university.name }}</p>
               </div>
+              <p>Кол-во отзывов: <span class="badge badge-dark">25</span></p>
             </li>
           </a>
         </div>

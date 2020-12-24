@@ -6,21 +6,20 @@ from .models import Universities, Opinions
 from .forms import OpinionForm
 
 #   Список университетов
-class MainPostList(View):
-    def get(self, request):
-        universities = Universities.objects.order_by("-id")
-        #   Пагинатор выбирает из таблицы Universities 8 университетов и выводит их на страницу
-        paginator = Paginator(universities, 8)
+def index(request):
+    universities = Universities.objects.all()
+    #   Пагинатор выбирает из таблицы Universities 4 университетов и выводит их на страницу
+    paginator = Paginator(universities, 4)
 
-        page_number = request.GET.get('page')
-        try:
-            page_obj = paginator.page(page_number)
-        except PageNotAnInteger:
-            page_obj = paginator.page(1)
-        except EmptyPage:
-            page_obj = paginator.page(paginator.num_pages)
+    page_number = request.GET.get('page')
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        page_obj = paginator.page(paginator.num_pages)
 
-        return render(request, "search_reviews/index.html", context = {"page_obj" : page_obj})
+    return render(request, "search_reviews/index.html", context = {"page_obj" : page_obj})
 
 #   Выбранный университет
 class ReviewsDetailView(DetailView):
