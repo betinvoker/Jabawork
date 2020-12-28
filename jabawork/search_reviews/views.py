@@ -8,7 +8,7 @@ from .forms import OpinionForm
 #   Список университетов
 def index(request):
     universities = Universities.objects.all()
-    #   Пагинатор выбирает из таблицы Universities 4 университетов и выводит их на страницу
+    #   Пагинатор выбирает из таблицы Universities 4 университета и выводит их на страницу
     paginator = Paginator(universities, 4)
 
     page_number = request.GET.get('page')
