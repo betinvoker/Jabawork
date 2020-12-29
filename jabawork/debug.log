@@ -16,3 +16,17 @@
 [1228/134558.935:ERROR:directory_reader_win.cc(43)] FindFirstFile: Системе не удается найти указанный путь. (0x3)
 [1228/141402.168:ERROR:directory_reader_win.cc(43)] FindFirstFile: Системе не удается найти указанный путь. (0x3)
 [1228/145026.792:ERROR:directory_reader_win.cc(43)] FindFirstFile: Системе не удается найти указанный путь. (0x3)
+[1229/122341.861:ERROR:process_reader_win.cc(123)] NtOpenThread: {Отказано в доступе} Процесс запросил доступ к объекту, но права на доступ не предоставлены. (0xc0000022)
+[1229/122341.861:ERROR:exception_snapshot_win.cc(99)] thread ID 8160 not found in process
+[1229/122341.872:ERROR:process_reader_win.cc(123)] NtOpenThread: {Отказано в доступе} Процесс запросил доступ к объекту, но права на доступ не предоставлены. (0xc0000022)
+[1229/122341.872:ERROR:exception_snapshot_win.cc(99)] thread ID 15240 not found in process
+[1229/123655.689:ERROR:process_reader_win.cc(123)] NtOpenThread: {Отказано в доступе} Процесс запросил доступ к объекту, но права на доступ не предоставлены. (0xc0000022)
+[1229/123655.690:ERROR:exception_snapshot_win.cc(99)] thread ID 9624 not found in process
+[1229/123655.699:ERROR:process_reader_win.cc(123)] NtOpenThread: {Отказано в доступе} Процесс запросил доступ к объекту, но права на доступ не предоставлены. (0xc0000022)
+[1229/123655.699:ERROR:exception_snapshot_win.cc(99)] thread ID 7616 not found in process
+[1229/141921.807:ERROR:process_reader_win.cc(123)] NtOpenThread: {Отказано в доступе} Процесс запросил доступ к объекту, но права на доступ не предоставлены. (0xc0000022)
+[1229/141921.807:ERROR:exception_snapshot_win.cc(99)] thread ID 10000 not found in process
+[1229/141921.830:ERROR:process_reader_win.cc(151)] SuspendThread: Отказано в доступе. (0x5)
+[1229/141921.830:ERROR:process_reader_win.cc(123)] NtOpenThread: {Отказано в доступе} Процесс запросил доступ к объекту, но права на доступ не предоставлены. (0xc0000022)
+[1229/141921.830:ERROR:exception_snapshot_win.cc(99)] thread ID 14320 not found in process
+[1229/150647.464:ERROR:directory_reader_win.cc(43)] FindFirstFile: Системе не удается найти указанный путь. (0x3)

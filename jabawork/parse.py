@@ -14,11 +14,9 @@ conn = sqlite3.connect('db.sqlite3')
 cursor = conn.cursor()
 
 def main():
-    #   Проверить таблицу Universities на заполненность.
-    #   Если в ней уже есть записи, то сравнить последнюю запись с первой записью на странице.
-    #   Иначе, просто заполнить таблицу. 
+    #   Проверить и заполнить таблицу Universities.
     changing_the_table_universities()
-    #   Заполнение таблици Opinions. 
+    #   Проверить и заполнить таблици Opinions. 
     filling_in_the_table_opinions()
     #   Закрыть браузер после выполнения
     driver.close()
@@ -59,16 +57,19 @@ def filling_in_the_table_opinions():
         sqlite_select_count_opinions = "SELECT search_reviews_universities.id, COUNT(search_reviews_opinions.university_id) FROM search_reviews_universities LEFT JOIN search_reviews_opinions ON search_reviews_universities.id = search_reviews_opinions.university_id WHERE search_reviews_universities.id = "  + str(university[0]) + " GROUP BY search_reviews_universities.id"
         cursor.execute(sqlite_select_count_opinions)
         count_opinions = int(cursor.fetchone()[1])
-        all_opinions = len(list(driver.find_elements_by_class_name('mobpadd20-2')))
+
+        driver.get(university[3])
+        click_btn_opinions()
+        time.sleep(5)
+        all_opinions = int(len(list(driver.find_elements_by_class_name('mobpadd20-2'))))
         #   Если количество записей в таблице больше нуля, то выполняем условие.
         #   Если оно равно нулю, тогда заполняем таблицу данными со страницы сайта.
-        if count_opinions > int(all_opinions):
-            print("Кол-во университетов - " + str(count_opinions) + "/" + str(all_opinions))
-        else:
-            driver.get(university[3])
-            click_btn_opinions()
+        print(str(university[1]) + " | Кол-во отзывов - " + str(count_opinions) + "/" + str(all_opinions) + "\n")
+        if count_opinions > all_opinions:
+            print(str(university[1]) + " | Кол-во отзывов - " + str(count_opinions) + "/" + str(all_opinions) + "\n")
             parse_list_of_opinions(university[0])
-            time.sleep(5)
+        else:
+            parse_list_of_opinions(university[0])
 
 #   Нажимать на кнопку загрузить еще, пока она существует на странице
 def click_btn_universities():
@@ -120,6 +121,10 @@ def parse_list_of_opinions(university):
     i = 1
     #   Цикл сбора данных и записи данных об университете
     for opinion in all_opinions:
+        if check_exists_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]/b'):
+            btn = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]/b')
+            driver.execute_script("arguments[0].click();", btn)
+
         text = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]')
         date_opinion = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[1]/div/div[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/span[2]')
         picture = opinion.find_element_by_tag_name("img")
@@ -130,7 +135,7 @@ def parse_list_of_opinions(university):
             opinion = "True"
         
         id_university = str(university)
-
+        
         print(text.text + " | " + date_opinion.text + " | " + opinion + " | " + id_university + "\n")
         adding_opinions(text.text, date_opinion.text, opinion, id_university)
         
@@ -153,6 +158,14 @@ def adding_opinions(text, date_opinion, opinion, id_university):
 def check_exists_by_class_name(class_name):
     try:
         driver.find_element_by_class_name(class_name)
+    except NoSuchElementException:
+        return False
+    return True
+
+#   Проверка элемента на наличие по xpath
+def check_exists_by_xpath(xpath):
+    try:
+        driver.find_element_by_xpath(xpath)
     except NoSuchElementException:
         return False
     return True
