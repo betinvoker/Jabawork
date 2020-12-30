@@ -21,22 +21,20 @@ def main():
     #   Закрыть браузер после выполнения
     driver.close()
 
-#   Проверить таблицу Universities на заполненность.
-#   Если в ней уже есть записи, то сравнить последнюю запись с первой записью на странице.
-#   Иначе, просто заполнить таблицу. 
+#   Проверить таблицу Universities на заполненность и заполнить.
 def changing_the_table_universities():
     #   Главная страница сайта
     driver.get("https://tabiturient.ru/")
     #   Нажимать на кнопку загрузить еще, пока она существует на странице
     click_btn_universities()
+    #   Найти общее количество университетов
     block = driver.find_element_by_id('resultdiv0')
     all_universities = len(block.find_elements_by_class_name('mobpadd20'))
     #   Берем количество записей из таблицы Universities и присваиваем его переменной
     sqlite_select_count_universities = "SELECT COUNT(*) FROM search_reviews_universities"
     cursor.execute(sqlite_select_count_universities)
     count_universities = int(cursor.fetchone()[0])
-    #   Если количество записей в таблице больше нуля, то выполняем условие.
-    #   Если оно равно нулю, тогда заполняем таблицу данными со страницы сайта.
+    #   Если количество записей в таблице больше нуля, то выполняем условие, иначе заполнить таблицу.
     if count_universities == all_universities:
         #   Пока не придумал, что должно тут выводиться
         print("Таблица Universities содержит - " + str(count_universities) + " записей из "+ str(all_universities) +"\n")
@@ -45,7 +43,7 @@ def changing_the_table_universities():
         #   Парсить данные об университетах со страницы
         parse_list_of_universities()
 
-#   Заполнение таблици Opinions.
+#   Проверить таблицу Opinions на заполненность и заполнить.
 def filling_in_the_table_opinions():
     #   Взять из базы список университетов
     sqlite_select_query = "SELECT * from search_reviews_universities"
@@ -70,26 +68,6 @@ def filling_in_the_table_opinions():
             parse_list_of_opinions(university[0])
         else:
             parse_list_of_opinions(university[0])
-
-#   Нажимать на кнопку загрузить еще, пока она существует на странице
-def click_btn_universities():
-    btn = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]')
-    while True:
-        if driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]').is_displayed():
-            btn.click()
-            time.sleep(5)
-        else:
-            break
-
-#   Открыть страницу с отзывами и нажимать кнопку, пока она существует на странице
-def click_btn_opinions():
-    while check_exists_by_class_name('mobpadd10') == True:
-        btn = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[7]')
-        if btn.is_displayed():
-            btn.click()
-            time.sleep(5)
-        else:
-            break
 
 #   Парсить данные об университетах со страницы
 def parse_list_of_universities():  
@@ -123,26 +101,40 @@ def parse_list_of_opinions(university):
     for opinion in all_opinions:
         #   Нажимать на ссылку "Показать полностью..."
         click_on_show_link(opinion, '/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]/b')
-
+        #   Узнать, позитивный или негативный отзыв
+        status = positive_or_negative_opinions(opinion)
+        #   Получение данных(текст, дата отзыва, университет)
         text = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]')
         date_opinion = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[1]/div/div[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/span[2]')
-        picture = opinion.find_element_by_tag_name("img")
-
         id_university = str(university)
-        if picture.get_attribute("src") == "https://tabiturient.ru/img/smile2.png":
-            opinion = "False"
-        else:
-            opinion = "True"
-        
-        
-        
-        print(text.text + " | " + date_opinion.text + " | " + opinion + " | " + id_university + "\n")
-        adding_opinions(text.text, date_opinion.text, opinion, id_university)
+
+        print(text.text + " | " + date_opinion.text + " | " + status + " | " + id_university + "\n")
+        adding_opinions(text.text, date_opinion.text, status, id_university)
         
         i += 1
 
     #   Сохранить изменения в базе
     conn.commit()
+
+#   Нажимать на кнопку загрузить еще, пока она существует на странице
+def click_btn_universities():
+    btn = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]')
+    while True:
+        if driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]').is_displayed():
+            btn.click()
+            time.sleep(5)
+        else:
+            break
+
+#   Открыть страницу с отзывами и нажимать кнопку, пока она существует на странице
+def click_btn_opinions():
+    while check_exists_by_class_name('mobpadd10') == True:
+        btn = driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[7]')
+        if btn.is_displayed():
+            btn.click()
+            time.sleep(5)
+        else:
+            break
 
 #   Добавить университет в базу
 def adding_universities(abbreviated, full_name, link, logo, link_universitiy):
@@ -150,15 +142,23 @@ def adding_universities(abbreviated, full_name, link, logo, link_universitiy):
                         (abbreviated, full_name, link, logo, link_universitiy))
        
 #   Добавить отзывов об университете в базу
-def adding_opinions(text, date_opinion, opinion, id_university):
+def adding_opinions(text, date_opinion, status, id_university):
     cursor.execute("INSERT INTO search_reviews_opinions(text, date_opinion, opinion, university_id) VALUES (?,?,?,?)", 
-                        (text, date_opinion, opinion, id_university))
+                        (text, date_opinion, status, id_university))
 
 #   Нажимать на ссылку "Показать полностью..."
 def click_on_show_link(opinion, show_full):
     if check_exists_by_xpath(show_full):
         btn = opinion.find_element_by_xpath(show_full)
         driver.execute_script("arguments[0].click();", btn)
+
+#   Узнать, позитивный или негативный отзыв
+def positive_or_negative_opinions(opinion):
+    picture = opinion.find_element_by_tag_name("img")
+    if picture.get_attribute("src") == "https://tabiturient.ru/img/smile2.png":
+        return "False"
+    else:
+        return "True"
 
 #   Проверка элемента на наличие по классу
 def check_exists_by_class_name(class_name):
