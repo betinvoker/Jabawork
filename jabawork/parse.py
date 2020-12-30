@@ -121,20 +121,20 @@ def parse_list_of_opinions(university):
     i = 1
     #   Цикл сбора данных и записи данных об университете
     for opinion in all_opinions:
-        if check_exists_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]/b'):
-            btn = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]/b')
-            driver.execute_script("arguments[0].click();", btn)
+        #   Нажимать на ссылку "Показать полностью..."
+        click_on_show_link(opinion, '/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]/b')
 
         text = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[' + str(i) + ']/div[1]/div[2]')
         date_opinion = opinion.find_element_by_xpath('/html/body/div[1]/div[2]/div[1]/div/div[5]/div[1]/div[1]/div[1]/div/div[1]/table/tbody/tr/td[2]/table/tbody/tr/td[5]/span[2]')
         picture = opinion.find_element_by_tag_name("img")
 
+        id_university = str(university)
         if picture.get_attribute("src") == "https://tabiturient.ru/img/smile2.png":
             opinion = "False"
         else:
             opinion = "True"
         
-        id_university = str(university)
+        
         
         print(text.text + " | " + date_opinion.text + " | " + opinion + " | " + id_university + "\n")
         adding_opinions(text.text, date_opinion.text, opinion, id_university)
@@ -153,6 +153,12 @@ def adding_universities(abbreviated, full_name, link, logo, link_universitiy):
 def adding_opinions(text, date_opinion, opinion, id_university):
     cursor.execute("INSERT INTO search_reviews_opinions(text, date_opinion, opinion, university_id) VALUES (?,?,?,?)", 
                         (text, date_opinion, opinion, id_university))
+
+#   Нажимать на ссылку "Показать полностью..."
+def click_on_show_link(opinion, show_full):
+    if check_exists_by_xpath(show_full):
+        btn = opinion.find_element_by_xpath(show_full)
+        driver.execute_script("arguments[0].click();", btn)
 
 #   Проверка элемента на наличие по классу
 def check_exists_by_class_name(class_name):
